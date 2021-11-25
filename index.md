@@ -49,6 +49,8 @@ nano db.reverse
 ```
 ![Image](dns4.jpeg)
 
+![Image](explication.jpeg)
+
    - ## Verify the configuration.
     
 # 4. Configure the DNS Client.
