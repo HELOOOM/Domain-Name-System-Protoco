@@ -41,7 +41,7 @@ Now we will add the details which is necessary for forward resolution into /etc/
 
 We will add the details which are necessary for reverse resolution to the file /etc/bind/db.reverse. Copy the file /etc/bind/db.127 to /etc/bind/db.reverse
 
-![Image](dns3.jpeg)
+![Image](dns4.jpeg)
 
    - ## Verify the configuration.
 # 4. Configure the DNS Client.
