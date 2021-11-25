@@ -51,11 +51,11 @@ nano db.reverse
 ## Explication
 ![Image](explication.png)
 
-Finally, restart the bind9 service:
 
-![Image](dns5.jpeg)
    - ## Verify the configuration.
-    
+     Finally, restart the bind9(or named) service:
+     
+       ![Image](dns5.jpeg)
 # 4. Configure the DNS Client.
 # 5. Configure primary and secondary DNS servers.
    -  ## Configure the primary DNS server as a master.
