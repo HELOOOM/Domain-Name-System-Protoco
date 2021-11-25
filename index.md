@@ -56,7 +56,41 @@ nano db.reverse
      Finally, restart the bind9(or named) service:
      
        ![Image](dns5.jpeg)
+       
+       ![Image](dns7.jpeg)
 # 4. Configure the DNS Client.
+
+Local name resolution is done via /etc/hosts file. If you have small network, use /etc/hosts file. DNS (domain name service is accountable for associating domain names with ip address, for example domain yahoo.com is easy to remember than IP address 202.66.66.12) provides better name resolution. To configure Linux as DNS client you need to edit or modify /etc/resolv.conf file. This file defines which name servers to use. You want to setup Linux to browse net or run network services like www or smtp; then you need to point out to correct ISP DNS servers:
+
+## /etc/resolv.conf file
+
+In Linux and Unix like computer operating systems, the /etc/resolv.conf configuration file contains information that allows a computer connected to the Internet to convert alpha-numeric names into the numeric IP addresses that are required for access to external network resources on the Internet. The process of converting domain names to IP addresses is called “resolving.”
+
+The resolv.conf file typically contains the IP addresses of nameservers (DNS name resolvers) that attempt to translate names into addresses for any node available on the network.
+
+## Setup DNS Name resolution
+Steps to configure Linux as DNS client, first login as a root user (use su command):
+
+**Step # 1**: Open /etc/resolv.conf file:
+
+`# vi /etc/resolv.conf`
+
+**Step #2**: Add your ISP nameserver as follows:
+```
+search isp.com
+nameserver 202.54.1.110
+nameserver 202.54.1.112
+nameserver 202.54.1.115
+```
+Note Max. three nameserver can be used/defined at a time.
+
+**Step #3**:Test setup nslookup or dig command:
+```
+$ dig www.nixcraft.com
+$ nslookup www.nixcraft.com
+```   
+
+
 # 5. Configure primary and secondary DNS servers.
    -  ## Configure the primary DNS server as a master.
    -  ## Configure the secondary DNS server as a slave.
