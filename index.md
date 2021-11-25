@@ -25,9 +25,14 @@ functionality
     8.8.4.4;
 };
    ```
-   After the above change, restart the DNS server.
+   After the above change, start the DNS server.
+   
+   ![Image](dns1.jpeg)
    
    - ## Create and configure zone files.
+
+To add a DNS Forward and Reverse resolution to bind9, edit /etc/bind9/named.conf.local.
+
    - ## Verify the configuration.
 # 4. Configure the DNS Client.
 # 5. Configure primary and secondary DNS servers.
