@@ -35,15 +35,22 @@ To add a DNS Forward and Reverse resolution to bind9, edit /etc/bind9/named.conf
 
 ![Image](dns2.jpeg)
 
-Now we will add the details which is necessary for forward resolution into /etc/bind/db.thetadiststaf.net.
-
+Now we will add the details which is necessary for forward resolution into /etc/bind/db.thetadiststuff.net.copy file /etc/bind/db.local to /etc/bind/db.thetadiststuff
+```
+cp db.local  db.thetadiststuff
+nano db.thetadiststuff
+```
 ![Image](dns3.jpeg)
 
 We will add the details which are necessary for reverse resolution to the file /etc/bind/db.reverse. Copy the file /etc/bind/db.127 to /etc/bind/db.reverse
-
+```
+cp db.127  db.reverse
+nano db.reverse
+```
 ![Image](dns4.jpeg)
 
    - ## Verify the configuration.
+    
 # 4. Configure the DNS Client.
 # 5. Configure primary and secondary DNS servers.
    -  ## Configure the primary DNS server as a master.
