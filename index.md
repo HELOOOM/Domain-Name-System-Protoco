@@ -53,6 +53,7 @@ nano db.reverse
 
 Finally, restart the bind9 service:
 
+![Image](dns5.jpeg)
    - ## Verify the configuration.
     
 # 4. Configure the DNS Client.
