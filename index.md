@@ -2,10 +2,31 @@
 
 ## Part 1 : DNS configuration
 
-# 1. Define the DNS, identify its role and explain how it functions.
-# 2. Identify the different DNS servers.
+# 1. DNS definition, role and functionality.
+
+Domain Name Service (DNS) is an internet service that maps IP addresses to fully qualified domain names (FQDN) and vice versa.
+role 
+functionality
+# 2. the different DNS servers.
+
+
 # 3. Explain the DNS server’s configuration steps.
    - ## Configure the name.conf.
+   
+   Install the bind9(or named) package using the appropriate package management utilities for your Linux distributions.
+   ```
+    $ sudo apt-get install bind9
+   ```
+   All we have to do to configure a Cache NameServer is to add your ISP (Internet Service Provider)’s DNS server or any OpenDNS server to the file /etc/bind/named.conf.options. For Example, we will use google’s public DNS servers, 8.8.8.8 and 8.8.4.4.
+   Uncomment and edit the following line as shown below in /etc/bind/named.conf.options file.
+   ```
+   forwarders {
+    8.8.8.8;
+    8.8.4.4;
+};
+   ```
+   After the above change, restart the DNS server.
+   
    - ## Create and configure zone files.
    - ## Verify the configuration.
 # 4. Configure the DNS Client.
