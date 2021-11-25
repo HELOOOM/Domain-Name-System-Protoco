@@ -48,8 +48,10 @@ cp db.127  db.reverse
 nano db.reverse
 ```
 ![Image](dns4.jpeg)
+## Explication
+![Image](explication.png)
 
-![Image](explication.jpeg)
+Finally, restart the bind9 service:
 
    - ## Verify the configuration.
     
