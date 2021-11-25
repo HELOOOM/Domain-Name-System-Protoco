@@ -58,6 +58,7 @@ nano db.reverse
        ![Image](dns5.jpeg)
        
        ![Image](dns7.jpeg)
+       
 # 4. Configure the DNS Client.
 
 Local name resolution is done via /etc/hosts file. If you have small network, use /etc/hosts file. DNS (domain name service is accountable for associating domain names with ip address, for example domain yahoo.com is easy to remember than IP address 202.66.66.12) provides better name resolution. To configure Linux as DNS client you need to edit or modify /etc/resolv.conf file. This file defines which name servers to use. You want to setup Linux to browse net or run network services like www or smtp; then you need to point out to correct ISP DNS servers:
