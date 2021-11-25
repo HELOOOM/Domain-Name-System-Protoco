@@ -33,6 +33,8 @@ functionality
 
 To add a DNS Forward and Reverse resolution to bind9, edit /etc/bind9/named.conf.local.
 
+![Image](dns2.jpeg)
+
    - ## Verify the configuration.
 # 4. Configure the DNS Client.
 # 5. Configure primary and secondary DNS servers.
