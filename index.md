@@ -90,7 +90,9 @@ Note Max. three nameserver can be used/defined at a time.
 $ dig www.nixcraft.com
 $ nslookup www.nixcraft.com
 ```   
+the previous configuration is explained by this exemple:
 
+![Image](dns6.jpeg)
 
 # 5. Configure primary and secondary DNS servers.
    -  ## Configure the primary DNS server as a master.
