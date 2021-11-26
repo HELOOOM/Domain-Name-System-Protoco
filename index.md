@@ -96,5 +96,102 @@ the previous configuration is explained by this exemple:
 
 # 5. Configure primary and secondary DNS servers.
    -  ## Configure the primary DNS server as a master.
+   Here are the steps to configure DNS master-slave server in Linux. Here is our setup.
+   ```
+   Master DNS Server IP: 54.43.32.21 ( ns1.example.com )
+Slave  DNS Server IP: 54.43.32.22 ( ns2.example.com )
+Domain Name : example.com   ( For Testing Purpose )
+Domain IP   : 54.43.32.20  ( For Testing Purpose )
+   ```
+   Open terminal and run the following command to open named.conf file.
+   `$ vi /var/named/chroot/etc/named.conf`
+   Update listen-on and allow-query variables’ values in the options block as shown with the address CIDR for your server, shown in bold.
+   ```
+   options {
+        listen-on port 53 { 127.0.0.1; 54.43.32.0/24; };
+ ...
+        allow-query     { localhost; 54.43.32.0/24; };
+        recursion yes;
+
+ ...
+};
+   ```
+   We need to create separate zone for each of our domain. Since we have only 1 domain example.com, we create zone file for it.\
+   
+   
+   `$ vi /var/named/chroot/var/named/example.com.db`
+   
+   Add the following lines to it. Replace example.com with your domain name, ns1.example.com with subdomain of your master, ns2.example.com with subdomain of your slave.
+   ```
+   ; Zone file for example.com
+$TTL 14400
+@      86400    IN      SOA     ns1.example.com. webmaster.example.com. (
+                3215040200      ; serial, todays date+todays
+                86400           ; refresh, seconds
+                7200            ; retry, seconds
+                3600000         ; expire, seconds
+                86400 )         ; minimum, seconds
+
+example.com. 86400 IN NS ns1.example.com.
+example.com. 86400 IN NS ns2.example.com.
+example.com. IN A 192.168.1.100
+example.com. IN MX 0 example.com.
+mail IN CNAME example.com.
+www IN CNAME example.com.
+```
+Now we need to add details of this zone file in our named.conf file updated in previous step. Open it again in text editor and add the following lines. Replace example.com with your domain name.
+
+```
+zone "example.com" IN {
+        type master;
+        file "/var/named/example.com.db";
+	allow-update { none; };
+};
+```
+Save and close the file. Run the following command to start named service.
+```
+$ /etc/init.d/named restart
+$ chkconfig named on
+```
+
+   
    -  ## Configure the secondary DNS server as a slave.
+
+Now we need to configure Slave DNS server. In this case, we need to update only named.conf file. All changes made on Master will be automatically synced with its slaves at regular intervals of time. Open named.conf file in text editor.
+
+`$ vi /var/named/chroot/etc/named.conf`
+
+In this case also, update listen-on and allow-query variables’ values in the options block as shown with the address CIDR for your server, shown in **bold**.
+```
+options {
+        listen-on port 53 { 127.0.0.1; 54.43.32.0/24; };
+ ...
+        allow-query     { localhost; 54.43.32.0/24; };
+        recursion yes;
+
+ ...
+};
+```
+Start named service with the following command.
+
+```
+$ /etc/init.d/named restart
+$ chkconfig named on
+```
+After restarting named service, you will be able to see zone files in slave DNS at /var/named/chroot/var/named/slaves/.
    -  ## Test the configuration by stopping the master DNS.
+   Now you can query your DNS master & slaves with the following command.
+   
+   `nslookup <domainname.com> <dns server name/ip>`
+   
+   You should get the same response from both of them. Here’s the query to Master DNS server.
+   ```
+   $ nslookup example.com 54.43.32.21
+
+Server:         54.43.32.21
+Address:        54.43.32.21#53
+
+Name:   example.com
+Address: 54.43.32.20
+```
+The above output shows that both DNS master and slave have correctly resolved domain example.com. In this article, we have learnt how to setup DNS Master-Slave server. You can customize it according to your requirements. Although the above steps are for RHEL/Fedora/CentOS, you can also use it for Ubuntu/Debian Linux.
