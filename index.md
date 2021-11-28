@@ -441,11 +441,11 @@ Address:     192.168.56.101 #53
 
 Name:   dns-dhcp.example.com
 Adress: 192.168.56.101
-
+```
 
 #nslookup 192.168.1.22
-
+```
 56.168.192.in-addr.arpa	    name = dns-dhcp.example.com.
 56.168.192.in-addr.arpa	    name = client1.example.com.
-
+```
 
