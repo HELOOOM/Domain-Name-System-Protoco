@@ -186,6 +186,7 @@ After restarting named service, you will be able to see zone files in slave DNS 
    `nslookup <domainname.com> <dns server name/ip>`
    
    You should get the same response from both of them. Here’s the query to Master DNS server.
+   
    ```
    $ nslookup example.com 54.43.32.21
 
@@ -194,6 +195,7 @@ Address:        54.43.32.21#53
 
 Name:   example.com
 Address: 54.43.32.20
+
 ```
 The above output shows that both DNS master and slave have correctly resolved domain example.com. In this article, we have learnt how to setup DNS Master-Slave server. You can customize it according to your requirements. Although the above steps are for RHEL/Fedora/CentOS, you can also use it for Ubuntu/Debian Linux.
 
@@ -204,6 +206,7 @@ The above output shows that both DNS master and slave have correctly resolved do
 a. Install the necessary packages.
 
 Install all bind and dhcp packages
+
 ```
 #yum install bind bind-chroot dhcpd net-toools  bind-utils -y
 ```
@@ -212,6 +215,7 @@ Install all bind and dhcp packages
 ```
 #chkconfig named on
 #chkconfig dhcpd on
+
 ```
 b. Configure the forward and reverse zones.
 
@@ -220,6 +224,7 @@ Copy the sample bind configuration file under chroot environment. It will reflec
 ```
   # cp /usr/share/doc/bind-9.11.4/sample/etc/named.conf   /var/named/chroot/etc/
   # vi  /etc/named.conf
+  
 ```
 ```
 options {
@@ -274,6 +279,7 @@ notify no;
 allow-query { any; };
 allow-update { 192.168.56.101; };
 };
+
 ```
 
 Creating Zone Files
@@ -298,6 +304,7 @@ $TTL 86400      ; 1 day
                         A       192.168.56.101
 client1                 A       192.168.56.102
 dns-dhcp                A       192.168.56.101
+
 ```
 
 2. Reverse lookup zone
@@ -318,6 +325,7 @@ $TTL 86400      ; 1 day
                         A       192.168.56.101
 101                     PTR     dns-dhcp.example.com.
 102                     PTR     client1.example.com.
+
 ```
 ## Verify configured files
 ```
@@ -325,6 +333,7 @@ $TTL 86400      ; 1 day
 #named-checkzone example.com /var/named/example.com.zone
 # named-checkzone 56.168.192.in-addr.arpa /var/named/56.168.192.in-addr.arpa.zone
 #service named restart
+
 ```
 Check named server status
 
@@ -335,6 +344,7 @@ Configure DHCP server
 copy sample dhcp configuration file and do below changes.
 
 `#cp /usr/share/doc/dhcp*/dhcpd.conf.sample /etc/dhcp/dhcpd.conf`
+
 ```
 [root@dns-dhcp ~]# cat /etc/dhcp/dhcpd.conf
 
@@ -393,6 +403,7 @@ at first enable ip forwarding
 reset iptables rules
 # iptables -F
 # iptables -t nat -F
+
 ```
 allow forwarding from the local network
 
