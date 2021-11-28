@@ -1,14 +1,15 @@
 # Domain Name System Protocol
 
-## Part 1 : DNS configuration
+## Part I : DNS configuration
+
 
 # 1. DNS definition, role and functionality.
-
+(Domain Name System) The Internet's system for converting alphabetic names into numeric IP addresses. For example, when a Web address (URL) is typed into a browser, DNS servers return the IP address of the Web server associated with that name.
 Domain Name Service (DNS) is an internet service that maps IP addresses to fully qualified domain names (FQDN) and vice versa.
-role 
-functionality
+
 # 2. the different DNS servers.
 
+The three DNS server types server are the following: DNS stub resolver server. DNS recursive resolver server. DNS authoritative server.
 
 # 3. Explain the DNS server’s configuration steps.
    - ## Configure the name.conf.
@@ -195,3 +196,15 @@ Name:   example.com
 Address: 54.43.32.20
 ```
 The above output shows that both DNS master and slave have correctly resolved domain example.com. In this article, we have learnt how to setup DNS Master-Slave server. You can customize it according to your requirements. Although the above steps are for RHEL/Fedora/CentOS, you can also use it for Ubuntu/Debian Linux.
+
+Part II : DDNS configuration
+
+1. Configure the DDNS server.
+
+a. Install the necessary packages.
+
+b. Configure the forward and reverse zones.
+
+2. Configure the client.
+
+4. Verify the configuration
