@@ -201,9 +201,12 @@ Part II : DDNS configuration
 
 1. Configure the DDNS server.
 
-a. Install the necessary packages.
+ Configure the forward and reverse zones.
 
-b. Configure the forward and reverse zones.
+`nano /etc/named.conf`
+
+![Image](dns8.jpeg)
+
 
 2. Configure the client.
 
