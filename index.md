@@ -387,6 +387,7 @@ now we restart the DHCP server
 route internal packet to external network 
 
 at first enable ip forwarding
+
 ```
 # echo 1 > /proc/sys/net/ipv4/ip_forward
 reset iptables rules
@@ -412,15 +413,18 @@ make routing changes persistent
 should install iptables-services package.
 
 Then service iptables save will work. Also these commands will work too:
+
 ```
 # iptables-save > /etc/sysconfig/iptables
 # ip6tables-save > /etc/sysconfig/ip6tables
+
 ```
 
 2. Configure the client.
   Update resolver details
   
   `#vi /etc/resolv.conf`
+  
   ```
   nameserver 192.168.56.101
 DOMAIN=example.com
@@ -439,13 +443,13 @@ On all other client machines (rhel2.example.com) remove static IP if there is an
 Server:      192.168.56.101
 Address:     192.168.56.101 #53
 
-Name:   dns-dhcp.example.com
+Name:   rhel2.example.com
 Adress: 192.168.56.101
 ```
 
 #nslookup 192.168.1.22
 ```
-56.168.192.in-addr.arpa	    name = dns-dhcp.example.com.
-56.168.192.in-addr.arpa	    name = client1.example.com.
+1.168.192.in-addr.arpa	    name = rhel2.example.com.
+1.168.192.in-addr.arpa	    name = client1.example.com.
 ```
 
