@@ -197,17 +197,255 @@ Address: 54.43.32.20
 ```
 The above output shows that both DNS master and slave have correctly resolved domain example.com. In this article, we have learnt how to setup DNS Master-Slave server. You can customize it according to your requirements. Although the above steps are for RHEL/Fedora/CentOS, you can also use it for Ubuntu/Debian Linux.
 
-Part II : DDNS configuration
+# Part II : DDNS configuration
 
 1. Configure the DDNS server.
 
- Configure the forward and reverse zones.
+a. Install the necessary packages.
 
-`nano /etc/named.conf`
+Install all bind and dhcp packages
+```
+#yum install bind bind-chroot dhcpd net-toools  bind-utils -y
+```
+ Enable both the service in required run levels
+ 
+```
+#chkconfig named on
+#chkconfig dhcpd on
+```
+b. Configure the forward and reverse zones.
 
-![Image](dns8.jpeg)
+Copy the sample bind configuration file under chroot environment. It will reflected automatically under /etc.
 
+```
+  # cp /usr/share/doc/bind-9.11.4/sample/etc/named.conf   /var/named/chroot/etc/
+  # vi  /etc/named.conf
+```
+```
+options {
+        listen-on port 53 { 192.168.56.101; };
+        listen-on-v6 port 53 { ::1; };
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        recursing-file  "/var/named/data/named.recursing";
+        secroots-file   "/var/named/data/named.secroots";
+        allow-query     { localhost; 192.168.56.0/24; };
+        allow-query-cache { localhost; 192.168.56.0/24; };
+
+        /*
+         - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
+         - If you are building a RECURSIVE (caching) DNS server, you need to enable
+           recursion.
+         - If your recursive DNS server has a public IP address, you MUST enable access
+           control to limit queries to your legitimate users. Failing to do so will
+           cause your server to become part of large scale DNS amplification
+           attacks. Implementing BCP38 within your network would greatly
+           reduce such attack surface
+        */
+
+        recursion yes;
+
+#       dnssec-enable yes;
+#       dnssec-validation yes;
+
+        /* Path to ISC DLV key */
+#       bindkeys-file "/etc/named.root.key";
+#       managed-keys-directory "/var/named/dynamic";
+#       pid-file "/run/named/named.pid";
+#       session-keyfile "/run/named/session.key";
+};
+
+/* Forward Lookup Zone */
+zone "example.com" {
+type master;
+file "example.com.zone";
+notify no;
+allow-query { any; };
+allow-update { 192.168.56.101; }; /* this should be dhcp server address*/
+};
+
+/* Reverse Lookup Zone */
+zone "56.168.192.in-addr.arpa" {
+type master;
+file "56.168.192.in-addr.arpa.zone";
+notify no;
+allow-query { any; };
+allow-update { 192.168.56.101; };
+};
+```
+
+Creating Zone Files
+
+Zone file are the one holds mapping between IP address and System names. The named daemon refers these two files for any query.
+
+1. Forward lookup zone
+```
+[root@dns-dhcp ~]# cat /var/named/example.com.zone
+
+$TTL 86400      ; 1 day
+
+@             IN SOA  dns-dhcp.example.com. root.example.com. (
+                                123        ; serial
+                                10800      ; refresh (3 hours)
+                                900        ; retry (15 minutes)
+                                604800     ; expire (1 week)
+                               86400      ; minimum (1 day)
+                                )
+
+                        NS      dns-dhcp.example.com.
+                        A       192.168.56.101
+client1                 A       192.168.56.102
+dns-dhcp                A       192.168.56.101
+```
+
+2. Reverse lookup zone
+
+```
+[root@dns-dhcp ~]# cat /var/named/56.168.192.in-addr.arpa.zone
+
+$TTL 86400      ; 1 day
+@                            IN SOA  56.168.192.in-addr.arpa. root.example.com. (
+                                77         ; serial
+                                86400      ; refresh (1 day)
+                                3600       ; retry (1 hour)
+                                604800     ; expire (1 week)
+                               10800      ; minimum (3 hours)
+                                )
+
+                        NS      dns-dhcp.example.com.
+                        A       192.168.56.101
+101                     PTR     dns-dhcp.example.com.
+102                     PTR     client1.example.com.
+```
+## Verify configured files
+```
+#named-checkconf /etc/named.conf
+#named-checkzone example.com /var/named/example.com.zone
+# named-checkzone 56.168.192.in-addr.arpa /var/named/56.168.192.in-addr.arpa.zone
+#service named restart
+```
+Check named server status
+
+`#rndc status`
+
+Configure DHCP server
+
+copy sample dhcp configuration file and do below changes.
+
+`#cp /usr/share/doc/dhcp*/dhcpd.conf.sample /etc/dhcp/dhcpd.conf`
+```
+[root@dns-dhcp ~]# cat /etc/dhcp/dhcpd.conf
+
+option domain-name "example.com";
+option domain-name-servers dns-dhcp.example.com;
+default-lease-time 600;
+max-lease-time 7200;
+
+# Use this to enble / disable dynamic dns updates globally.
+ddns-update-style interim;
+ddns-updates on;
+ignore client-updates;
+update-static-leases on;
+ddns-domainname "example.com";
+server-identifier dns-dhcp.example.com;
+
+# If this DHCP server is the official DHCP server for the local
+# network, the authoritative directive should be uncommented.
+
+authoritative;
+
+# Use this to send dhcp log messages to a different log file (you also
+# have to hack syslog.conf to complete the redirection).
+#log-facility local7;
+
+/* Zone Declaration for Dynamic Update */
+zone example.com. {
+primary 192.168.56.101;
+}
+
+zone 56.168.192.in-addr.arpa. {
+primary 192.168.56.101;
+}
+
+subnet 192.168.56.0 netmask 255.255.255.0 {
+                                                range 192.168.56.21 192.168.56.40;
+                                                option domain-name-servers 192.168.56.101;
+                                                option domain-name "example.com";
+                                                option routers 192.168.56.101;
+                                                option broadcast-address 192.168.56.255;
+                                                default-lease-time 600;
+                                               max-lease-time 7200;
+                                        }
+ 
+```
+now we restart the DHCP server
+
+`#service dhcpd  restart`
+
+route internal packet to external network 
+
+at first enable ip forwarding
+```
+# echo 1 > /proc/sys/net/ipv4/ip_forward
+reset iptables rules
+# iptables -F
+# iptables -t nat -F
+```
+allow forwarding from the local network
+
+`iptables -A FORWARD -i eth0 -o wth0 -j ACCEPT`
+
+allow responses back in
+
+`iptables -A FORWARD -i wth0 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT`
+
+masquerade the ip address
+
+`iptables -t nat -A POSTROUTING -o wth0 -j MASQUERADE`
+
+make routing changes persistent
+
+`/etc/sysctl.conf and uncommenting the net.ipv4.ip_forward = 1`
+
+should install iptables-services package.
+
+Then service iptables save will work. Also these commands will work too:
+```
+# iptables-save > /etc/sysconfig/iptables
+# ip6tables-save > /etc/sysconfig/ip6tables
+```
 
 2. Configure the client.
+  Update resolver details
+  
+  `#vi /etc/resolv.conf`
+  ```
+  nameserver 192.168.56.101
+DOMAIN=example.com
+
+  ```
+On all other client machines (rhel2.example.com) remove static IP if there is any, configure boot protocol as DHCP and restart network service.
+
+`#vi /etc/sysconfig/network-scripts/ifcfg-etho`
+
+`BOOTPROTO=dhcp`
 
 4. Verify the configuration
+
+#nslookup rhel2.example.com
+``` 
+Server:      192.168.56.101
+Address:     192.168.56.101 #53
+
+Name:   dns-dhcp.example.com
+Adress: 192.168.56.101
+
+
+#nslookup 192.168.1.22
+
+56.168.192.in-addr.arpa	    name = dns-dhcp.example.com.
+56.168.192.in-addr.arpa	    name = client1.example.com.
+
+
